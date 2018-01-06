@@ -45,11 +45,15 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
+    /**
+     * 初始化数据
+     */
     private void initData() {
         Calendar cal = Calendar.getInstance();
         currentMonth = cal.get(Calendar.MONTH) + 1;
         currentYear = cal.get(Calendar.YEAR);
         parentList = new String[currentMonth];
+        //默认显示当前年，当前月数据
         for (int i = 0; i < currentMonth; i++) {
             parentList[i] = currentYear + "年" + (currentMonth - i) + "月";
         }
@@ -84,10 +88,22 @@ public class MainActivity extends AppCompatActivity {
             public void onBtnClick(String year, String month, String data) {
                 childrenList.clear();
                 dataset.clear();
+                //初始化只有当前月的数据，但是为了显示效果，默认给三个月的数据
                 if (year.equals("最近三个月")) {
                     parentList = new String[3];
                     for (int i = 0; i < parentList.length; i++) {
-                        parentList[i] = currentYear + "年" + (currentMonth - i) + "月";
+                        //当月份为1月，2月的时候，做一点特殊的处理
+                        if(currentMonth==1){
+                            parentList[0] = currentYear + "年" + currentMonth+ "月";
+                            parentList[1] = (currentYear- 1)+"年12月";
+                            parentList[2] = (currentYear-1)+"年11月";
+                        }else if(currentMonth==2){
+                            parentList[0] = currentYear + "年" + (currentMonth - i) + "月";
+                            parentList[1] = currentYear+"年"+(currentMonth-1)+"月";
+                            parentList[2] = (currentYear-1)+"年12月";
+                        }else {
+                            parentList[i] = currentYear + "年" + (currentMonth - i) + "月";
+                        }
                     }
                     for (int i = 0; i < 6; i++) {
                         childrenList.add(i + "");
@@ -115,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < parentList.length; i++) {
                     adapter.refresh(expandablelistview, i);
                 }
-                Log.d("dataset", dataset.toString());
                 timePickerDialog.dismiss();
             }
         });
@@ -244,7 +259,11 @@ public class MainActivity extends AppCompatActivity {
             //当parenList.length==1的时候，要提防parentList[parentPos]数组下标越界，
             // parentPos滑动的时候，有可能为1，所以当只有一条数据的时候，直接得到下标为0的值
             if (parentList.length == 1) {
-                text.setText(parentList[0] + dataset.get(parentList[0]).get(childPos) + "");
+//                if(dataset!=null){
+                    text.setText(parentList[0] + dataset.get(parentList[0]).get(childPos) + "");
+//                }else{
+//                    Toast.makeText(MainActivity.this,"没有数据",Toast.LENGTH_SHORT).show();
+//                }
             } else {
                 text.setText(parentList[parentPos] + dataset.get(parentList[parentPos]).get(childPos) + "");
             }
